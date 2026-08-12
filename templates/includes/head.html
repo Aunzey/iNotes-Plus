@@ -1,0 +1,87 @@
+{{define "head"}}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{.SiteTitle}}</title>
+<link rel="shortcut icon" href="/favicon.ico?v={{.Site.Utils.Now}}">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+<style>
+{{if ne .Site.CustomConfig.contentMaxWidth "800px"}}
+.main { max-width: {{.Site.CustomConfig.contentMaxWidth | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.textSize "16px"}}
+.post-detail .post .post-content p { font-size: {{.Site.CustomConfig.textSize | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.titleAlign "center"}}
+.post-container .post .post-title, .post-container .post .post-info, .post-detail .post .post-title, .post-detail .post .post-info { text-align: {{.Site.CustomConfig.titleAlign | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.siteFont "-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Droid Sans Fallback','Microsoft YaHei',sans-serif"}}
+body { font-family: {{.Site.CustomConfig.siteFont | safeCSS}}; }
+{{end}}
+{{if not .Site.CustomConfig.openPostToc}}
+.toc-container { display: none; }
+{{end}}
+{{if ne .Site.CustomConfig.contentBgColor "#ffffff"}}
+.main { background: {{.Site.CustomConfig.contentBgColor | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.pageBgColor "#ffffff"}}
+body { background: {{.Site.CustomConfig.pageBgColor | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.textColor "rgba(0, 0, 0, 0.86)"}}
+body { color: {{.Site.CustomConfig.textColor | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.linkColor "rgba(0,0,0,.98)"}}
+a { color: {{.Site.CustomConfig.linkColor | safeCSS}}; }
+{{end}}
+{{if ne .Site.CustomConfig.linkHoverColor "#006CFF"}}
+a:hover { color: {{.Site.CustomConfig.linkHoverColor | safeCSS}}; }
+{{end}}
+{{if .Site.CustomConfig.customCss}}
+{{.Site.CustomConfig.customCss | safeCSS}}
+{{end}}
+</style>
+<link rel="alternate" type="application/atom+xml" title="{{.SiteTitle}} - Atom Feed" href="/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+{{if .Site.CustomConfig.ga}}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{.Site.CustomConfig.ga}}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', '{{.Site.CustomConfig.ga}}');
+</script>
+{{end}}
+
+{{if ne .Site.CustomConfig.openDarkMode false}}
+<script>
+  (function () {
+    var root = document.documentElement
+    var stored = null
+    try { stored = localStorage.getItem('inotes-theme') } catch (e) {}
+    var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (dark) root.classList.add('dark')
+
+    var mql = window.matchMedia('(prefers-color-scheme: dark)')
+    var onSystemChange = function (e) {
+      try {
+        if (localStorage.getItem('inotes-theme')) return
+      } catch (err) {}
+      root.classList.toggle('dark', e.matches)
+    }
+    if (mql.addEventListener) mql.addEventListener('change', onSystemChange)
+    else if (mql.addListener) mql.addListener(onSystemChange)
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var btn = document.querySelector('.theme-toggle')
+      if (!btn) return
+      btn.addEventListener('click', function () {
+        var isDark = root.classList.toggle('dark')
+        try { localStorage.setItem('inotes-theme', isDark ? 'dark' : 'light') } catch (e) {}
+      })
+    })
+  })()
+</script>
+{{end}}
+{{end}}

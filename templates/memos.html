@@ -1,0 +1,503 @@
+<html>
+
+<head>
+    {{template "head" .}}
+    <meta name="description" content="{{or .Site.CustomConfig.metaDescription .ThemeConfig.SiteDescription}}" />
+    <style>
+        /* ===== 闪念页 Memos ===== */
+        .memos-wrapper {
+            width: 100%;
+        }
+
+        /* 热力图 */
+        .heatmap-wrap {
+            --hm-0: #ebedf0;
+            --hm-1: #9be9a8;
+            --hm-2: #40c463;
+            --hm-3: #28df99;
+            --hm-4: #1a9f6b;
+            overflow-x: auto;
+            padding: 8px 0 16px;
+            margin-bottom: 8px;
+        }
+        .heatmap-wrap table {
+            border-collapse: separate;
+            border-spacing: 3px;
+            margin: 0 auto;
+        }
+        .heatmap-wrap td.hm-cell {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            padding: 0;
+        }
+        .heatmap-wrap .hm-cell.hm-0 { background: var(--hm-0); }
+        .heatmap-wrap .hm-cell.hm-1 { background: var(--hm-1); }
+        .heatmap-wrap .hm-cell.hm-2 { background: var(--hm-2); }
+        .heatmap-wrap .hm-cell.hm-3 { background: var(--hm-3); }
+        .heatmap-wrap .hm-cell.hm-4 { background: var(--hm-4); }
+        .heatmap-wrap .heatmap-day-label {
+            font-size: 10px;
+            color: #868e96;
+            text-align: right;
+            padding: 0 4px 0 0;
+            border: 0;
+        }
+        .heatmap-wrap .heatmap-month-label {
+            font-size: 10px;
+            color: #868e96;
+            text-align: left;
+            padding: 0;
+            border: 0;
+        }
+        .heatmap-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #868e96;
+            padding: 8px 4px 0;
+        }
+        .heatmap-legend {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            color: #868e96;
+        }
+        .heatmap-legend .hm-cell {
+            width: 10px;
+            height: 10px;
+        }
+
+        /* 闪念列表 */
+        .memos-list {
+            margin-top: 8px;
+        }
+        .memo-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #dfe2e5;
+        }
+        .memo-item:last-child {
+            border-bottom: 0;
+        }
+        .memo-body {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .memo-body.collapsed {
+            max-height: 160px;
+        }
+        .memo-content {
+            line-height: 1.62;
+            font-size: 16px;
+            letter-spacing: 0.05em;
+            word-wrap: break-word;
+        }
+        .memo-content a {
+            color: #006CFF;
+            border-bottom: 1px solid rgba(0, 108, 255, 0.3);
+            transition: all 0.3s;
+        }
+        .memo-content a:hover {
+            color: #0061e6;
+            border-bottom: 1px solid #0061e6;
+        }
+        .memo-content img {
+            max-width: 100%;
+            border-radius: 2px;
+            margin: 8px 0;
+        }
+        .memo-content blockquote {
+            color: #9a9a9a;
+            border-left: 3px solid #dfe2e5;
+            padding-left: 12px;
+            margin: 8px 0;
+        }
+        .memo-content p code,
+        .memo-content li code {
+            font-family: 'Source Code Pro', Consolas, Menlo, Monaco, 'Courier New', monospace;
+            background-color: #fff5f5;
+            color: #c53030;
+            padding: 0.2em 0.33333333em;
+            margin: 0 0.125em;
+            line-height: initial;
+            word-wrap: break-word;
+        }
+        .memo-content pre {
+            background: #f9f7f3;
+            border-radius: 5px;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+        .memo-content pre code {
+            font-family: 'Source Code Pro', Consolas, Menlo, Monaco, 'Courier New', monospace;
+            font-size: 0.96em;
+            line-height: 1.5;
+            background: none;
+            color: inherit;
+            padding: 0;
+            margin: 0;
+        }
+        .memo-expand-btn {
+            display: none;
+            margin-top: 8px;
+            padding: 2px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #868e96;
+            transition: all 0.3s;
+        }
+        .memo-expand-btn:hover {
+            color: #006CFF;
+        }
+        .memo-tags {
+            margin-top: 8px;
+        }
+        .memo-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 4px 8px 0 0;
+            background: #f8f9fa;
+            color: #495057;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+        .memo-meta {
+            margin-top: 8px;
+        }
+        .memo-meta time {
+            font-size: 12px;
+            color: #5E5E5E;
+        }
+
+        /* 分页 */
+        .memo-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0 8px;
+            overflow: hidden;
+        }
+        .memo-pagination a {
+            padding: 6px 4px;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+        }
+        .memo-pagination a:hover {
+            border-bottom: 2px solid;
+        }
+        .memo-pagination a.disabled {
+            color: #ced4da;
+            pointer-events: none;
+        }
+        .memo-page-info {
+            font-size: 12px;
+            color: #868e96;
+        }
+
+        /* 空状态 */
+        .memos-empty {
+            text-align: center;
+            padding: 48px 0;
+            color: #868e96;
+        }
+
+        /* ===== 黑暗模式 ===== */
+        html.dark .heatmap-wrap {
+            --hm-0: #2d2d2d;
+            --hm-1: #0e4429;
+            --hm-2: #006d32;
+            --hm-3: #26a641;
+            --hm-4: #39d353;
+        }
+        html.dark .heatmap-wrap .heatmap-day-label,
+        html.dark .heatmap-wrap .heatmap-month-label,
+        html.dark .heatmap-footer,
+        html.dark .heatmap-legend {
+            color: #9aa4af;
+        }
+        html.dark .memo-item {
+            border-bottom-color: #3a3a3a;
+        }
+        html.dark .memo-content a {
+            color: #58a6ff;
+            border-bottom-color: rgba(88, 166, 255, 0.3);
+        }
+        html.dark .memo-content a:hover {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+        }
+        html.dark .memo-content blockquote {
+            color: #b0b0b0;
+            border-left-color: #3a3a3a;
+        }
+        html.dark .memo-content p code,
+        html.dark .memo-content li code {
+            background-color: rgba(255, 94, 94, 0.16);
+            color: #ffa1a1;
+        }
+        html.dark .memo-content pre {
+            background: #212121;
+        }
+        html.dark .memo-expand-btn {
+            color: #9aa4af;
+        }
+        html.dark .memo-expand-btn:hover {
+            color: #58a6ff;
+        }
+        html.dark .memo-tag {
+            background: #2a2a2a;
+            color: #a8b0ba;
+        }
+        html.dark .memo-meta time {
+            color: #9a9a9a;
+        }
+        html.dark .memo-pagination a.disabled {
+            color: #6b7280;
+        }
+        html.dark .memo-page-info {
+            color: #9aa4af;
+        }
+        html.dark .memos-empty {
+            color: #9aa4af;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            {{template "header" .}}
+
+            <div class="post-detail">
+                <article class="post">
+                    <h2 class="post-title">闪念</h2>
+
+                    {{if and .Memos (gt (len .Memos) 0)}}
+                    <div class="memos-wrapper">
+
+                        <!-- 热力图 -->
+                        <div class="heatmap-wrap">
+                            <div id="heatmap-root"></div>
+                            <div class="heatmap-footer">
+                                <span id="heatmap-total"></span>
+                                <div class="heatmap-legend">
+                                    <span>少</span>
+                                    <span class="hm-cell hm-0"></span>
+                                    <span class="hm-cell hm-1"></span>
+                                    <span class="hm-cell hm-2"></span>
+                                    <span class="hm-cell hm-3"></span>
+                                    <span class="hm-cell hm-4"></span>
+                                    <span>多</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 闪念列表 -->
+                        <div class="memos-list">
+                            {{range .Memos}}
+                            <div class="memo-item" data-created="{{.CreatedAtISO}}">
+                                <div class="memo-body">
+                                    <div class="memo-content" v-pre>
+                                        {{.Content}}
+                                    </div>
+                                </div>
+                                {{if .Tags}}
+                                <div class="memo-tags">
+                                    {{range .Tags}}
+                                    <span class="memo-tag"># {{.}}</span>
+                                    {{end}}
+                                </div>
+                                {{end}}
+                                <div class="memo-meta">
+                                    <time>{{.DateFormat}}</time>
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+
+                        <!-- 分页控件 -->
+                        <div class="memo-pagination" id="memo-pagination">
+                            <a href="javascript:void(0);" id="memo-prev-btn" class="disabled" onclick="memoPrevPage()">←
+                                上一页</a>
+                            <span class="memo-page-info" id="memo-page-info"></span>
+                            <a href="javascript:void(0);" id="memo-next-btn" onclick="memoNextPage()">下一页 →</a>
+                        </div>
+
+                        <script>
+                            (function () {
+                                var MEMO_PER_PAGE = 20;
+                                var currentPage = 1;
+                                var items = document.querySelectorAll('.memo-item');
+                                var totalItems = items.length;
+                                var totalPages = Math.ceil(totalItems / MEMO_PER_PAGE);
+
+                                // 初始化内容折叠
+                                items.forEach(function (item) {
+                                    var body = item.querySelector('.memo-body');
+                                    var content = item.querySelector('.memo-content');
+                                    if (content && content.scrollHeight > 160) {
+                                        body.classList.add('collapsed');
+                                        var btn = document.createElement('button');
+                                        btn.className = 'memo-expand-btn';
+                                        btn.style.display = 'inline';
+                                        btn.textContent = '展开全文 ▼';
+                                        btn.onclick = function () {
+                                            if (body.classList.contains('collapsed')) {
+                                                body.style.maxHeight = content.scrollHeight + 'px';
+                                                body.classList.remove('collapsed');
+                                                btn.textContent = '收起 ▲';
+                                            } else {
+                                                body.style.maxHeight = '160px';
+                                                body.classList.add('collapsed');
+                                                btn.textContent = '展开全文 ▼';
+                                            }
+                                        };
+                                        body.parentNode.insertBefore(btn, body.nextSibling);
+                                    }
+                                });
+
+                                // ======= GitHub 风格热力图 =======
+                                var heatmapData = {};
+                                items.forEach(function (item) {
+                                    var d = item.getAttribute('data-created');
+                                    if (d) {
+                                        var dateStr = d.substring(0, 10);
+                                        heatmapData[dateStr] = (heatmapData[dateStr] || 0) + 1;
+                                    }
+                                });
+
+                                var MONTHS = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                                var DAYS = ['日', '一', '二', '三', '四', '五', '六'];
+
+                                var today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                var endDay = today.getDay();
+                                var totalDays = 52 * 7 + endDay + 1;
+                                var startDate = new Date(today);
+                                startDate.setDate(startDate.getDate() - totalDays + 1);
+                                startDate.setDate(startDate.getDate() - startDate.getDay());
+
+                                var totalWeeks = Math.ceil(totalDays / 7);
+
+                                var weeks = [];
+                                for (var w = 0; w < totalWeeks; w++) {
+                                    var week = [];
+                                    for (var d = 0; d < 7; d++) {
+                                        var cellDate = new Date(startDate);
+                                        cellDate.setDate(cellDate.getDate() + w * 7 + d);
+                                        var key = cellDate.getFullYear() + '-' + String(cellDate.getMonth() + 1).padStart(2, '0') + '-' + String(cellDate.getDate()).padStart(2, '0');
+                                        var count = heatmapData[key] || 0;
+                                        var level = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : count <= 5 ? 3 : 4;
+                                        var future = cellDate > today;
+                                        week.push({ date: cellDate, key: key, count: count, level: level, future: future, month: cellDate.getMonth(), dayOfMonth: cellDate.getDate() });
+                                    }
+                                    weeks.push(week);
+                                }
+
+                                var monthLabels = [];
+                                var lastMonth = -1;
+                                for (var w = 0; w < weeks.length; w++) {
+                                    var firstDay = weeks[w][0];
+                                    if (!firstDay.future && firstDay.month !== lastMonth) {
+                                        monthLabels.push({ weekIndex: w, label: MONTHS[firstDay.month] });
+                                        lastMonth = firstDay.month;
+                                    }
+                                }
+
+                                var html = '<table>';
+
+                                html += '<tr><td class="heatmap-day-label"></td>';
+                                var monthColIdx = 0;
+                                for (var w = 0; w < totalWeeks; w++) {
+                                    if (monthColIdx < monthLabels.length && monthLabels[monthColIdx].weekIndex === w) {
+                                        var nextIdx = monthColIdx + 1 < monthLabels.length ? monthLabels[monthColIdx + 1].weekIndex : totalWeeks;
+                                        var span = nextIdx - w;
+                                        html += '<td colspan="' + span + '" class="heatmap-month-label">' + monthLabels[monthColIdx].label + '</td>';
+                                        w += span - 1;
+                                        monthColIdx++;
+                                    } else {
+                                        html += '<td class="heatmap-month-label"></td>';
+                                    }
+                                }
+                                html += '</tr>';
+
+                                for (var d = 0; d < 7; d++) {
+                                    html += '<tr>';
+                                    html += '<td class="heatmap-day-label">' + DAYS[d] + '</td>';
+                                    for (var w = 0; w < weeks.length; w++) {
+                                        var c = weeks[w][d];
+                                        if (c.future) {
+                                            html += '<td></td>';
+                                        } else {
+                                            html += '<td class="hm-cell hm-' + c.level + '" title="' + c.key + ': ' + c.count + ' 条闪念"></td>';
+                                        }
+                                    }
+                                    html += '</tr>';
+                                }
+
+                                html += '</table>';
+                                var root = document.getElementById('heatmap-root');
+                                root.innerHTML = html;
+                                document.getElementById('heatmap-total').textContent = '过去一年共 ' + totalItems + ' 条闪念';
+
+                                setTimeout(function () {
+                                    var wrap = document.querySelector('.heatmap-wrap');
+                                    if (wrap) {
+                                        wrap.scrollLeft = wrap.scrollWidth;
+                                    }
+                                }, 100);
+
+                                // ======= 分页 =======
+                                function updatePagination() {
+                                    for (var i = 0; i < items.length; i++) {
+                                        var start = (currentPage - 1) * MEMO_PER_PAGE;
+                                        var end = currentPage * MEMO_PER_PAGE;
+                                        if (i >= start && i < end) {
+                                            items[i].classList.remove('memo-hide');
+                                        } else {
+                                            items[i].classList.add('memo-hide');
+                                        }
+                                    }
+                                    var prevBtn = document.getElementById('memo-prev-btn');
+                                    var nextBtn = document.getElementById('memo-next-btn');
+                                    var pageInfo = document.getElementById('memo-page-info');
+
+                                    prevBtn.className = currentPage <= 1 ? 'disabled' : '';
+                                    nextBtn.className = currentPage >= totalPages ? 'disabled' : '';
+                                    pageInfo.textContent = currentPage + ' / ' + totalPages;
+
+                                    if (totalPages <= 1) {
+                                        document.getElementById('memo-pagination').style.display = 'none';
+                                    }
+                                }
+
+                                window.memoNextPage = function () {
+                                    if (currentPage < totalPages) { currentPage++; updatePagination(); window.scrollTo(0, 0); }
+                                };
+                                window.memoPrevPage = function () {
+                                    if (currentPage > 1) { currentPage--; updatePagination(); window.scrollTo(0, 0); }
+                                };
+
+                                updatePagination();
+                            })();
+                        </script>
+
+                    </div>
+                    {{else}}
+                    <p class="memos-empty">暂无闪念</p>
+                    {{end}}
+
+                </article>
+            </div>
+
+            {{template "footer" .}}
+        </div>
+    </div>
+</body>
+
+</html>

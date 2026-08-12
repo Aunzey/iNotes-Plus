@@ -1,0 +1,28 @@
+<html>
+
+<head>
+    {{template "head" .}}
+    <meta name="description" content="{{or .Site.CustomConfig.metaDescription .ThemeConfig.SiteDescription}}" />
+</head>
+
+<body>
+    <div class="main">
+        <div class="main-content">
+            {{template "header" .}}
+
+            <div class="categories-container">
+                {{if .Categories}}
+                {{range .Categories}}
+                <a class="category" href="{{.Link}}">{{.Name}}</a>
+                {{end}}
+                {{else}}
+                <p class="categories-empty">暂无分类</p>
+                {{end}}
+            </div>
+
+            {{template "footer" .}}
+        </div>
+    </div>
+</body>
+
+</html>
