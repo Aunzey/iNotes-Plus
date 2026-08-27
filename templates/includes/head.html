@@ -1,7 +1,7 @@
 {{define "head"}}
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>{{.SiteTitle}}</title>
+<title>{{block "pageTitle" .}}{{or .SiteTitle .ThemeConfig.SiteName}}{{end}}</title>
 <link rel="shortcut icon" href="/favicon.ico?v={{.Site.Utils.Now}}">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="/styles/main.css">
@@ -40,7 +40,7 @@ a:hover { color: {{.Site.CustomConfig.linkHoverColor | safeCSS}}; }
 {{.Site.CustomConfig.customCss | safeCSS}}
 {{end}}
 </style>
-<link rel="alternate" type="application/atom+xml" title="{{.SiteTitle}} - Atom Feed" href="/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="{{or .SiteTitle .ThemeConfig.SiteName}} - Atom Feed" href="/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 {{if .Site.CustomConfig.ga}}
