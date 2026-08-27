@@ -25,6 +25,8 @@
             border-collapse: separate;
             border-spacing: 3px;
             margin: 0 auto;
+            font-size: 0;
+            line-height: 0;
         }
         .heatmap-wrap td.hm-cell {
             width: 10px;
@@ -39,17 +41,27 @@
         .heatmap-wrap .hm-cell.hm-4 { background: var(--hm-4); }
         .heatmap-wrap .heatmap-day-label {
             font-size: 10px;
+            line-height: 10px;
             color: #868e96;
             text-align: right;
             padding: 0 4px 0 0;
             border: 0;
         }
         .heatmap-wrap .heatmap-month-label {
+            position: relative;
+            height: 10px;
             font-size: 10px;
+            line-height: 10px;
             color: #868e96;
             text-align: left;
             padding: 0;
             border: 0;
+        }
+        .heatmap-wrap .heatmap-month-label .hm-month-text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            white-space: nowrap;
         }
         .heatmap-footer {
             display: flex;
@@ -400,15 +412,22 @@
                                     weeks.push(week);
                                 }
 
+                                // 逐天遍历：月份标签挂在"该月第一个日期"所在周，跨月周不再被错标到上月
                                 var monthLabels = [];
                                 var lastMonth = -1;
                                 for (var w = 0; w < weeks.length; w++) {
-                                    var firstDay = weeks[w][0];
-                                    if (!firstDay.future && firstDay.month !== lastMonth) {
-                                        monthLabels.push({ weekIndex: w, label: MONTHS[firstDay.month] });
-                                        lastMonth = firstDay.month;
+                                    for (var d = 0; d < 7; d++) {
+                                        var day = weeks[w][d];
+                                        if (day.future) continue;
+                                        if (day.month !== lastMonth) {
+                                            monthLabels.push({ weekIndex: w, label: MONTHS[day.month] });
+                                            lastMonth = day.month;
+                                        }
                                     }
                                 }
+                                // 去掉首个标签：窗口首月不完整（通常只有末尾几周），且与窗口末月同名，
+                                // 只留一列宽还会让文字溢出与下一标签重叠；去掉后每月仅出现一次
+                                monthLabels.shift();
 
                                 var html = '<table>';
 
@@ -418,7 +437,8 @@
                                     if (monthColIdx < monthLabels.length && monthLabels[monthColIdx].weekIndex === w) {
                                         var nextIdx = monthColIdx + 1 < monthLabels.length ? monthLabels[monthColIdx + 1].weekIndex : totalWeeks;
                                         var span = nextIdx - w;
-                                        html += '<td colspan="' + span + '" class="heatmap-month-label">' + monthLabels[monthColIdx].label + '</td>';
+                                        // 标签绝对定位在周列起点，脱离表格布局，列宽始终由格子决定
+                                        html += '<td colspan="' + span + '" class="heatmap-month-label"><span class="hm-month-text">' + monthLabels[monthColIdx].label + '</span></td>';
                                         w += span - 1;
                                         monthColIdx++;
                                     } else {
