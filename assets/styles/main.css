@@ -774,19 +774,36 @@ td {
   left: 4px;
   transition: all 0.2s ease;
 }
-.next-post {
-  text-align: center;
+.post-nav {
+  display: flex;
+  justify-content: center;
   padding: 24px 32px;
 }
+.prev-post,
+.next-post {
+  flex: 1;
+  text-align: center;
+}
+.prev-post .next,
 .next-post .next {
   margin-bottom: 24px;
   color: #343a40;
   font-weight: lighter;
 }
+.prev-post .post-title,
 .next-post .post-title {
   font-size: 20px;
   font-weight: bold;
   letter-spacing: 0.02em;
+}
+.post-nav .post-title-empty {
+  color: #868e96;
+  font-weight: normal;
+}
+@media (max-width: 600px) {
+  .post-nav {
+    flex-direction: column;
+  }
 }
 #gitalk-container,
 #disqus_thread {
@@ -1165,8 +1182,12 @@ html.dark .post-detail .post .post-content .task-list-item-checkbox:before {
   background-color: #2d2d2d;
   border: 1px solid #6bcc8f;
 }
+html.dark .prev-post .next,
 html.dark .next-post .next {
   color: #9aa4af;
+}
+html.dark .post-nav .post-title-empty {
+  color: #6c757d;
 }
 
 /* 目录 */

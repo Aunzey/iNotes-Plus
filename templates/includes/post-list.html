@@ -34,9 +34,33 @@
         </a>
         {{end}}
         <div class="post-abstract">
-            {{.Abstract}}
+            <span class="md-strip">{{printf "%.300s" .Content}}</span>
         </div>
     </article>
     {{end}}
 </div>
+<script>
+    (function () {
+        var els = document.querySelectorAll('.md-strip')
+        for (var i = 0; i < els.length; i++) {
+            var text = els[i].textContent
+            text = text
+                .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+                .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+                .replace(/^#{1,6}\s+/gm, '')
+                .replace(/^```.*$/gm, '')
+                .replace(/\*\*([^*]+)\*\*/g, '$1')
+                .replace(/\*([^*]+)\*/g, '$1')
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/^\s*[-*+]\s+/gm, '')
+                .replace(/^\s*>\s?/gm, '')
+                .replace(/^---+$/gm, '')
+                .replace(/~~([^~]+)~~/g, '$1')
+                .replace(/<[^>]*>/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+            els[i].textContent = text.length > 120 ? text.slice(0, 120) + '…' : text
+        }
+    })()
+</script>
 {{end}}
