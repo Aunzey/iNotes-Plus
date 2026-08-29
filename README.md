@@ -1,20 +1,18 @@
 # iNotes-Plus
 
-> Notes 主题升级版
+> Gridea-Pro iNotes 主题升级版
 
-本主题为 iNotes 的升级版，基于以下上游：
+本主题基于以下上游：
 
 - [getgridea/gridea-theme-notes](https://github.com/getgridea/gridea-theme-notes) — 最初的 Notes 主题
 - [Gridea-Pro/gridea-pro-themes · themes/inotes](https://github.com/Gridea-Pro/gridea-pro-themes/tree/main/themes/inotes) — Gridea Pro 官方移植的 inotes（1.0.0）
-
-![preview](./assets/media/preview.png)
 
 ## 信息
 
 | 字段 | 值 |
 |---|---|
-| 目录名 | `inotes-Plus` |
-| 版本 | `1.1.0` |
+| 目录名 | `iNotes-Plus` |
+| 版本 | `1.1.5` |
 | 模板引擎 | `go` |
 
 ## 特性
@@ -22,8 +20,11 @@
 相对原版 1.0.0 的增量：
 
 - **亮/暗双主题**：页面右上角切换按钮，默认跟随系统，手动选择后通过 localStorage 记住
-- **闪念页**（`/memos`）：热力图 + 闪念列表 + 分页
+- **闪念页**（`/memos`）：热力图 + 闪念列表 + 分页；正文中的 `#标签` 自动隐藏（标签由闪念标签区单独展示）
 - **分类页**：单分类页 `category.html` + 分类列表 `categories.html`，与标签体系对称
+- **文章上一篇/下一篇导航**：文章页底部左右对称展示前后篇，无邻居时显示占位（「没有上一篇了/没有下一篇了」）；在列表中隐藏的文章不显示导航
+- **列表摘要**：首页/列表文章从正文去除 Markdown 标记后截取 120 字符纯文本摘要，不依赖文章「摘要」字段是否填写
+- **自定义内容支持 HTML**：站点描述、底部信息经 `safeHTML` 渲染，可填写标题、链接等 HTML
 - 文章列表与文章页新增分类展示；Disqus 评论主题跟随暗色模式
 
 
@@ -88,4 +89,4 @@
 
 ## 授权
 
-本主题未单独声明 `LICENSE` 文件，按仓库约定视为 **MIT**。
+**MIT**
