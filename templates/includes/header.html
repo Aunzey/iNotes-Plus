@@ -7,7 +7,7 @@
         {{.ThemeConfig.SiteName}}
     </h1>
     <p class="site-description">
-        {{.ThemeConfig.SiteDescription}}
+        {{.ThemeConfig.SiteDescription | safeHTML}}
     </p>
     <div class="menu-container">
         {{range .Menus}}

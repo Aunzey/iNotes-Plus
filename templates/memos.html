@@ -333,6 +333,21 @@
                             {{end}}
                         </div>
 
+                        <script>
+                            // 正文中隐藏 #标签（标签已在 memo-tags 单独展示）
+                            (function () {
+                                var contents = document.querySelectorAll('.memo-content')
+                                for (var i = 0; i < contents.length; i++) {
+                                    var walker = document.createTreeWalker(contents[i], NodeFilter.SHOW_TEXT)
+                                    var nodes = []
+                                    while (walker.nextNode()) nodes.push(walker.currentNode)
+                                    for (var j = 0; j < nodes.length; j++) {
+                                        nodes[j].nodeValue = nodes[j].nodeValue.replace(/(^|\s)#[^\s#]+/g, '$1')
+                                    }
+                                }
+                            })()
+                        </script>
+
                         <!-- 分页控件 -->
                         <div class="memo-pagination" id="memo-pagination">
                             <a href="javascript:void(0);" id="memo-prev-btn" class="disabled" onclick="memoPrevPage()">←
