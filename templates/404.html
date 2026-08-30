@@ -1,109 +1,289 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Page Not Found</title>
+  <title>404 · 页面走丢了</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      height: 100%;
     }
     body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.86);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    html.dark body {
+      background: #1e1e1e;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    /* 主容器：与主题 .main 一致（800px 居中） */
+    .main {
+      width: 100%;
+      max-width: 800px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #fff;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      text-align: center;
+      padding: 0 24px;
+      transition: background 0.3s ease;
     }
+    html.dark .main {
+      background: #1e1e1e;
+    }
+
+    /* 中央内容 */
     .box {
       flex: 1;
       display: flex;
-      justify-content: center;
       flex-direction: column;
-    }
-    .number {
-      font-size: 80px;
-      color: #666;
-      font-weight: bold;
-    }
-    .text {
-      font-size: 14px;
-      margin: 24px;
-      color: #333;
-    }
-    .btn-container {
-      display: flex;
+      align-items: center;
       justify-content: center;
+      text-align: center;
     }
-    .btn {
-      padding: 8px 24px;
+    .code-wrap {
+      animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .code-kicker {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.34em;
+      color: #ced4da;
+      margin-bottom: 14px;
+    }
+    html.dark .code-kicker {
+      color: #6b7280;
+    }
+    .code {
       display: inline-block;
-      text-decoration: none;
-      background: #fff;
-      border: 2px solid #efefef;
-      color: #333;
-      margin: 24px;
-      border-radius: 20px;
-      cursor: pointer;
+      font-size: clamp(88px, 22vw, 150px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      color: #343a40;
+      user-select: none;
+      transition: color 0.3s;
+      animation: float 7s ease-in-out 1.2s infinite;
+    }
+    .code:hover {
+      color: #006cff;
+    }
+    html.dark .code {
+      color: #e6e8eb;
+    }
+    html.dark .code:hover {
+      color: #58a6ff;
+    }
+    /* 主题风格装饰：主色短线 */
+    .code::after {
+      content: "";
+      display: block;
+      width: 48px;
+      height: 2px;
+      border-radius: 1px;
+      background: #006cff;
+      margin: 22px auto 0;
+    }
+    html.dark .code::after {
+      background: #58a6ff;
+    }
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      margin-top: 32px;
+      animation: fade-up 0.5s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .sub {
+      font-size: 14px;
+      color: #868e96;
+      margin-top: 12px;
+      letter-spacing: 0.02em;
+      animation: fade-up 0.5s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    html.dark .sub {
+      color: #9aa4af;
+    }
+
+    /* 按钮：主题链接风格（文字 + hover 下划线） */
+    .actions {
       display: flex;
       align-items: center;
+      gap: 28px;
+      margin-top: 36px;
+      animation: fade-up 0.5s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
-    .footer {
-      padding: 16px;
-      border-top: 1px solid #efefef;
-      color: #777;
-      font-weight: lighter;
-    }
-    .footer a {
+    .btn {
+      display: inline-block;
+      font-size: 15px;
+      font-weight: 600;
+      color: #495057;
       text-decoration: none;
-      font-weight: bold;
-      color: #000;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 3px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: #1a1a1a;
-      }
-      .number {
-        color: #aaa;
-      }
-      .text {
-        color: #ddd;
-      }
-      .btn {
-        background: #2a2a2a;
-        border-color: #444;
-        color: #ddd;
-      }
-      .footer {
-        border-top-color: #333;
-        color: #999;
-      }
-      .footer a {
-        color: #fff;
+    .btn:hover {
+      color: #006cff;
+      border-bottom-color: #006cff;
+    }
+    .btn-primary {
+      color: #006cff;
+    }
+    html.dark .btn {
+      color: #a8b0ba;
+    }
+    html.dark .btn:hover {
+      color: #58a6ff;
+      border-bottom-color: #58a6ff;
+    }
+    html.dark .btn-primary {
+      color: #58a6ff;
+    }
+
+    /* 主题切换按钮：与主题头部按钮一致 */
+    .theme-toggle {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 5;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: #fff;
+      color: #495057;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .theme-toggle:hover {
+      color: #006cff;
+      border-color: #006cff;
+    }
+    html.dark .theme-toggle {
+      background: #2a2a2a;
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #e8e8e8;
+    }
+    html.dark .theme-toggle:hover {
+      color: #58a6ff;
+      border-color: #58a6ff;
+    }
+    .theme-toggle .ri-sun-line {
+      display: none;
+    }
+    html.dark .theme-toggle .ri-moon-line {
+      display: none;
+    }
+    html.dark .theme-toggle .ri-sun-line {
+      display: inline;
+    }
+
+    /* 弱动效偏好 */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
       }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <div class="number">4 0 4</div>
-    <div class="text">
-      Page not found
-    </div>
-    <div class="btn-container">
-      <a class="btn" id="back">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" style="margin-right: 8px;">
-          <path fill="none" d="M0 0h24v24H0z"/>
-          <path d="M5.828 7l2.536 2.536L6.95 10.95 2 6l4.95-4.95 1.414 1.414L5.828 5H13a8 8 0 1 1 0 16H4v-2h9a6 6 0 1 0 0-12H5.828z"/>
-        </svg>
-        Back
-      </a>
+  <div class="main">
+    <div class="box">
+      <div class="code-wrap">
+        <span class="code-kicker">PAGE NOT FOUND</span>
+        <div class="code">404</div>
+      </div>
+      <h1 class="title">页面走丢了</h1>
+      <p class="sub">你访问的页面不存在，或已被移动到别处</p>
+      <div class="actions">
+        <a class="btn btn-primary" id="go-home">返回首页</a>
+        <a class="btn" id="go-back">返回上一页</a>
+      </div>
     </div>
   </div>
+
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换明亮/黑暗模式" title="切换明亮/黑暗模式">
+    <i class="ri-moon-line"></i>
+    <i class="ri-sun-line"></i>
+  </button>
+
   <script>
-    var back = document.getElementById('back')
-    back.onclick = function() { console.log('run...'); history.back() }
+    // ===== 主题检测（与站点其他页面一致：localStorage -> 系统偏好） =====
+    (function () {
+      var root = document.documentElement
+      var stored = null
+      try { stored = localStorage.getItem('inotes-theme') } catch (e) {}
+      var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+      if (dark) root.classList.add('dark')
+
+      var mql = window.matchMedia('(prefers-color-scheme: dark)')
+      var onSystemChange = function (e) {
+        try { if (localStorage.getItem('inotes-theme')) return } catch (err) {}
+        root.classList.toggle('dark', e.matches)
+      }
+      if (mql.addEventListener) mql.addEventListener('change', onSystemChange)
+      else if (mql.addListener) mql.addListener(onSystemChange)
+    })()
+
+    // ===== 主题切换按钮 =====
+    ;(function () {
+      var root = document.documentElement
+      var btn = document.getElementById('theme-toggle')
+      btn.addEventListener('click', function () {
+        var isDark = root.classList.toggle('dark')
+        try { localStorage.setItem('inotes-theme', isDark ? 'dark' : 'light') } catch (e) {}
+      })
+    })()
+
+    // ===== 按钮行为 =====
+    document.getElementById('go-home').addEventListener('click', function () {
+      location.href = '/'
+    })
+    document.getElementById('go-back').addEventListener('click', function () {
+      if (window.history.length > 1) window.history.back()
+      else location.href = '/'
+    })
   </script>
 </body>
 </html>

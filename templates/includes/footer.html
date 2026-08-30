@@ -1,8 +1,10 @@
 {{define "footer"}}
 <div class="site-footer">
     <span class="footer-info">{{.ThemeConfig.FooterInfo | safeHTML}}</span>
-    <a class="rss" href="/atom.xml" target="_blank">
+    {{if .ThemeConfig.FeedEnabled}}
+    <a class="rss" href="/feed.xml" target="_blank">
         <i class="ri-rss-line"></i> RSS
     </a>
+    {{end}}
 </div>
 {{end}}

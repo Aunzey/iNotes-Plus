@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>404 · 页面走丢了</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      height: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f6f7f9;
+      color: #343a40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    html.dark body {
+      background: #101216;
+      color: #e6e8eb;
+    }
+
+    /* ===== 背景光斑 ===== */
+    .aurora {
+      position: fixed;
+      inset: -20%;
+      z-index: 0;
+      filter: blur(80px);
+      opacity: 0.55;
+      pointer-events: none;
+      will-change: transform;
+    }
+    html.dark .aurora {
+      opacity: 0.85;
+    }
+    .aurora span {
+      position: absolute;
+      border-radius: 50%;
+      animation: drift 26s ease-in-out infinite;
+    }
+    .aurora .blob-1 {
+      width: 44vmax;
+      height: 44vmax;
+      left: -10vmax;
+      top: -12vmax;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 108, 255, 0.32), transparent 65%);
+    }
+    .aurora .blob-2 {
+      width: 40vmax;
+      height: 40vmax;
+      right: -8vmax;
+      bottom: -14vmax;
+      background: radial-gradient(circle at 70% 70%, rgba(150, 90, 255, 0.26), transparent 65%);
+      animation-delay: -9s;
+    }
+    .aurora .blob-3 {
+      width: 32vmax;
+      height: 32vmax;
+      left: 32%;
+      top: 16%;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 200, 180, 0.2), transparent 65%);
+      animation-delay: -17s;
+    }
+    html.dark .aurora .blob-1 {
+      background: radial-gradient(circle at 30% 30%, rgba(88, 166, 255, 0.26), transparent 65%);
+    }
+    html.dark .aurora .blob-2 {
+      background: radial-gradient(circle at 70% 70%, rgba(178, 122, 255, 0.22), transparent 65%);
+    }
+    html.dark .aurora .blob-3 {
+      background: radial-gradient(circle at 50% 50%, rgba(60, 220, 200, 0.16), transparent 65%);
+    }
+    @keyframes drift {
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(6vmax, -4vmax) scale(1.14);
+      }
+      66% {
+        transform: translate(-5vmax, 5vmax) scale(0.92);
+      }
+    }
+
+    /* ===== 粒子 ===== */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* ===== 卡片 ===== */
+    .stage {
+      position: relative;
+      z-index: 2;
+      will-change: transform;
+    }
+    .card {
+      width: min(560px, calc(100vw - 40px));
+      padding: 60px 40px 48px;
+      text-align: center;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 0 24px 60px -24px rgba(31, 41, 55, 0.25);
+      animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    html.dark .card {
+      background: rgba(24, 27, 32, 0.66);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+    }
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(28px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ===== 数字 ===== */
+    .code {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(96px, 24vw, 168px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      user-select: none;
+      background: linear-gradient(120deg, #1a2a6c, #2c5364 45%, #1a2a6c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: float 6s ease-in-out 1.2s infinite;
+    }
+    html.dark .code {
+      background: linear-gradient(120deg, #66d9ff, #b39dff 55%, #66d9ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    /* 故障层 */
+    .code::before,
+    .code::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .code::before {
+      color: rgba(255, 46, 99, 0.85);
+      animation: glitch-in 0.55s 0.45s both;
+    }
+    .code::after {
+      color: rgba(0, 229, 255, 0.85);
+      animation: glitch-in 0.55s 0.45s both reverse;
+    }
+    .code.ready::before,
+    .code.ready::after {
+      animation: none;
+      opacity: 0;
+    }
+    .code:hover::before,
+    .code:hover::after {
+      opacity: 0.75;
+      animation: glitch-shift 0.5s linear infinite;
+    }
+    .code:hover::after {
+      animation-direction: reverse;
+    }
+    @keyframes glitch-in {
+      0% {
+        opacity: 0;
+        clip-path: inset(0 0 0 0);
+      }
+      20% {
+        opacity: 0.85;
+        clip-path: inset(15% 0 60% 0);
+        transform: translate(-3px, 0);
+      }
+      40% {
+        clip-path: inset(60% 0 12% 0);
+        transform: translate(3px, 1px);
+      }
+      60% {
+        opacity: 0.85;
+        clip-path: inset(30% 0 45% 0);
+        transform: translate(-2px, -1px);
+      }
+      80% {
+        clip-path: inset(80% 0 4% 0);
+        transform: translate(2px, 0);
+      }
+      100% {
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+      }
+    }
+    @keyframes glitch-shift {
+      0% {
+        clip-path: inset(10% 0 78% 0);
+        transform: translate(-2px, 0);
+      }
+      25% {
+        clip-path: inset(62% 0 20% 0);
+        transform: translate(2px, 1px);
+      }
+      50% {
+        clip-path: inset(35% 0 48% 0);
+        transform: translate(-2px, -1px);
+      }
+      75% {
+        clip-path: inset(82% 0 5% 0);
+        transform: translate(2px, 0);
+      }
+      100% {
+        clip-path: inset(10% 0 78% 0);
+        transform: translate(-2px, 0);
+      }
+    }
+
+    /* ===== 文案 ===== */
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 28px;
+      animation: fade-up 0.7s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .sub {
+      font-size: 14px;
+      color: #868e96;
+      margin-top: 10px;
+      letter-spacing: 0.02em;
+      animation: fade-up 0.7s 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    html.dark .sub {
+      color: #9aa4af;
+    }
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ===== 按钮 ===== */
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      animation: fade-up 0.7s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #006cff, #7c5cff);
+      box-shadow: 0 8px 24px -8px rgba(0, 108, 255, 0.55);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px -8px rgba(0, 108, 255, 0.65);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    .btn-primary .arrow {
+      transition: transform 0.3s;
+    }
+    .btn-primary:hover .arrow {
+      transform: translateX(4px);
+    }
+    .btn-ghost {
+      color: #495057;
+      border-color: rgba(0, 0, 0, 0.14);
+      background: transparent;
+    }
+    .btn-ghost:hover {
+      border-color: #006cff;
+      color: #006cff;
+      background: rgba(0, 108, 255, 0.06);
+    }
+    html.dark .btn-ghost {
+      color: #c9ced6;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    html.dark .btn-ghost:hover {
+      border-color: #58a6ff;
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.08);
+    }
+    @media (max-width: 600px) {
+      .btn-row {
+        gap: 12px;
+        margin-top: 28px;
+      }
+      .btn {
+        padding: 11px 20px;
+        font-size: 14px;
+      }
+    }
+
+    /* ===== 主题切换 ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 3;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.8);
+      color: #495057;
+      font-size: 18px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s;
+    }
+    html.dark .theme-toggle {
+      background: rgba(30, 33, 38, 0.8);
+      border-color: rgba(255, 255, 255, 0.14);
+      color: #e8e8e8;
+    }
+    .theme-toggle:hover {
+      border-color: #006cff;
+      color: #006cff;
+      transform: translateY(-2px);
+    }
+    html.dark .theme-toggle:hover {
+      border-color: #58a6ff;
+      color: #58a6ff;
+    }
+    .theme-toggle .ri-sun-line {
+      display: none;
+    }
+    html.dark .theme-toggle .ri-moon-line {
+      display: none;
+    }
+    html.dark .theme-toggle .ri-sun-line {
+      display: inline;
+    }
+
+    /* ===== 弱动效偏好 ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true">
+    <span class="blob-1"></span>
+    <span class="blob-2"></span>
+    <span class="blob-3"></span>
+  </div>
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <main class="stage">
+    <div class="card">
+      <div class="code" data-text="404">404</div>
+      <h1 class="title">页面走丢了</h1>
+      <p class="sub">The page you're looking for has drifted away.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" id="go-home">
+          <span>返回首页</span>
+          <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+        <a class="btn btn-ghost" id="go-back">返回上一页</a>
+      </div>
+    </div>
+  </main>
+
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换明亮/黑暗模式" title="切换明亮/黑暗模式">
+    <i class="ri-moon-line"></i>
+    <i class="ri-sun-line"></i>
+  </button>
+
+  <script>
+    // ===== 主题检测（与站点其他页面一致：localStorage -> 系统偏好） =====
+    (function () {
+      var root = document.documentElement
+      var stored = null
+      try { stored = localStorage.getItem('inotes-theme') } catch (e) {}
+      var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+      if (dark) root.classList.add('dark')
+
+      var mql = window.matchMedia('(prefers-color-scheme: dark)')
+      var onSystemChange = function (e) {
+        try { if (localStorage.getItem('inotes-theme')) return } catch (err) {}
+        root.classList.toggle('dark', e.matches)
+        if (window.__404setTheme) window.__404setTheme(e.matches)
+      }
+      if (mql.addEventListener) mql.addEventListener('change', onSystemChange)
+      else if (mql.addListener) mql.addListener(onSystemChange)
+    })()
+
+    // ===== 主题切换按钮 =====
+    ;(function () {
+      var root = document.documentElement
+      var btn = document.getElementById('theme-toggle')
+      btn.addEventListener('click', function () {
+        var isDark = root.classList.toggle('dark')
+        try { localStorage.setItem('inotes-theme', isDark ? 'dark' : 'light') } catch (e) {}
+        if (window.__404setTheme) window.__404setTheme(isDark)
+      })
+    })()
+
+    // ===== 粒子场 =====
+    ;(function () {
+      var canvas = document.getElementById('particles')
+      if (!canvas || !canvas.getContext) return
+      var ctx = canvas.getContext('2d')
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      var dark = document.documentElement.classList.contains('dark')
+      var dots = []
+      var mouse = { x: -9999, y: -9999 }
+      var LINK = 110
+      var LINK_SQ = LINK * LINK
+
+      window.__404setTheme = function (isDark) { dark = isDark }
+
+      function rgb() { return dark ? '255,255,255' : '24,48,88' }
+
+      function spawn() {
+        dots.length = 0
+        var count = Math.min(120, Math.floor((canvas.clientWidth * canvas.clientHeight) / 12000))
+        for (var i = 0; i < count; i++) {
+          dots.push({
+            x: Math.random() * canvas.clientWidth,
+            y: Math.random() * canvas.clientHeight,
+            r: 0.6 + Math.random() * 1.4,
+            vx: (Math.random() - 0.5) * 0.24,
+            vy: (Math.random() - 0.5) * 0.24,
+            a: 0.18 + Math.random() * 0.34
+          })
+        }
+      }
+
+      function resize() {
+        var dpr = window.devicePixelRatio || 1
+        canvas.width = Math.floor(canvas.clientWidth * dpr)
+        canvas.height = Math.floor(canvas.clientHeight * dpr)
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        spawn()
+      }
+
+      function drawFrame() {
+        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
+        var color = rgb()
+        var n = dots.length
+        // 连线层（粒子间 + 鼠标）
+        for (var i = 0; i < n; i++) {
+          var a = dots[i]
+          for (var j = i + 1; j < n; j++) {
+            var b = dots[j]
+            var dx = a.x - b.x
+            var dy = a.y - b.y
+            var d2 = dx * dx + dy * dy
+            if (d2 < LINK_SQ) {
+              ctx.strokeStyle = 'rgba(' + color + ',' + ((1 - Math.sqrt(d2) / LINK) * 0.2).toFixed(3) + ')'
+              ctx.lineWidth = 1
+              ctx.beginPath()
+              ctx.moveTo(a.x, a.y)
+              ctx.lineTo(b.x, b.y)
+              ctx.stroke()
+            }
+          }
+          var mdx = mouse.x - a.x
+          var mdy = mouse.y - a.y
+          var md2 = mdx * mdx + mdy * mdy
+          if (md2 < LINK_SQ) {
+            ctx.strokeStyle = 'rgba(' + color + ',' + ((1 - Math.sqrt(md2) / LINK) * 0.3).toFixed(3) + ')'
+            ctx.beginPath()
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(mouse.x, mouse.y)
+            ctx.stroke()
+          }
+        }
+        // 粒子层
+        for (var k = 0; k < n; k++) {
+          var p = dots[k]
+          var dx = mouse.x - p.x
+          var dy = mouse.y - p.y
+          var dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < LINK && dist > 0.01) {
+            var f = (1 - dist / LINK) * 0.35
+            p.x += dx / dist * f
+            p.y += dy / dist * f
+          }
+          p.x += p.vx
+          p.y += p.vy
+          if (p.x < -10) p.x = canvas.clientWidth + 10
+          if (p.x > canvas.clientWidth + 10) p.x = -10
+          if (p.y < -10) p.y = canvas.clientHeight + 10
+          if (p.y > canvas.clientHeight + 10) p.y = -10
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(' + color + ',' + p.a + ')'
+          ctx.fill()
+        }
+      }
+
+      if (reduce) {
+        resize()
+        drawFrame()
+        return
+      }
+
+      resize()
+      window.addEventListener('resize', resize)
+      window.addEventListener('mousemove', function (e) {
+        mouse.x = e.clientX
+        mouse.y = e.clientY
+      })
+      document.addEventListener('mouseleave', function () {
+        mouse.x = -9999
+        mouse.y = -9999
+      })
+      ;(function loop() {
+        drawFrame()
+        requestAnimationFrame(loop)
+      })()
+    })()
+
+    // ===== 卡片视差（仅桌面） =====
+    ;(function () {
+      if ('ontouchstart' in window) return
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      var stage = document.querySelector('.stage')
+      var aurora = document.querySelector('.aurora')
+      var tx = 0, ty = 0, ax = 0, ay = 0
+      window.addEventListener('mousemove', function (e) {
+        tx = (e.clientX / innerWidth - 0.5) * 12
+        ty = (e.clientY / innerHeight - 0.5) * 10
+        ax = -(e.clientX / innerWidth - 0.5) * 30
+        ay = -(e.clientY / innerHeight - 0.5) * 24
+      })
+      ;(function loop() {
+        stage.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px)'
+        aurora.style.transform = 'translate(' + ax.toFixed(2) + 'px,' + ay.toFixed(2) + 'px)'
+        requestAnimationFrame(loop)
+      })()
+    })()
+
+    // ===== 入场故障播完后移除，避免与 hover 动画冲突 =====
+    setTimeout(function () {
+      var code = document.querySelector('.code')
+      if (code) code.classList.add('ready')
+    }, 1100)
+
+    // ===== 按钮行为 =====
+    document.getElementById('go-home').addEventListener('click', function () {
+      location.href = '/'
+    })
+    document.getElementById('go-back').addEventListener('click', function () {
+      if (window.history.length > 1) window.history.back()
+      else location.href = '/'
+    })
+  </script>
+</body>
+</html>

@@ -17,20 +17,22 @@
             --hm-2: #40c463;
             --hm-3: #28df99;
             --hm-4: #1a9f6b;
+            --hm-cell: 10px;
+            --hm-gap: 3px;
             overflow-x: auto;
             padding: 8px 0 16px;
             margin-bottom: 8px;
         }
         .heatmap-wrap table {
             border-collapse: separate;
-            border-spacing: 3px;
+            border-spacing: var(--hm-gap);
             margin: 0 auto;
             font-size: 0;
             line-height: 0;
         }
         .heatmap-wrap td.hm-cell {
-            width: 10px;
-            height: 10px;
+            width: var(--hm-cell);
+            height: var(--hm-cell);
             border-radius: 2px;
             padding: 0;
         }
@@ -219,6 +221,15 @@
             color: #868e96;
         }
 
+        /* ===== 手机端热力图适配 ===== */
+        @media (max-width: 600px) {
+            .heatmap-wrap {
+                /* 撑满文章内容区，格子尺寸由脚本按容器宽度自适应 */
+                margin-left: -16px;
+                margin-right: -16px;
+            }
+        }
+
         /* ===== 黑暗模式 ===== */
         html.dark .heatmap-wrap {
             --hm-0: #2d2d2d;
@@ -401,92 +412,114 @@
 
                                 var MONTHS = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
                                 var DAYS = ['日', '一', '二', '三', '四', '五', '六'];
+                                var MOBILE_QP = window.matchMedia('(max-width: 600px)');
+                                var heatmapWrap = document.querySelector('.heatmap-wrap');
+                                var heatmapRoot = document.getElementById('heatmap-root');
 
-                                var today = new Date();
-                                today.setHours(0, 0, 0, 0);
-                                var endDay = today.getDay();
-                                var totalDays = 52 * 7 + endDay + 1;
-                                var startDate = new Date(today);
-                                startDate.setDate(startDate.getDate() - totalDays + 1);
-                                startDate.setDate(startDate.getDate() - startDate.getDay());
-
-                                var totalWeeks = Math.ceil(totalDays / 7);
-
-                                var weeks = [];
-                                for (var w = 0; w < totalWeeks; w++) {
-                                    var week = [];
-                                    for (var d = 0; d < 7; d++) {
-                                        var cellDate = new Date(startDate);
-                                        cellDate.setDate(cellDate.getDate() + w * 7 + d);
-                                        var key = cellDate.getFullYear() + '-' + String(cellDate.getMonth() + 1).padStart(2, '0') + '-' + String(cellDate.getDate()).padStart(2, '0');
-                                        var count = heatmapData[key] || 0;
-                                        var level = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : count <= 5 ? 3 : 4;
-                                        var future = cellDate > today;
-                                        week.push({ date: cellDate, key: key, count: count, level: level, future: future, month: cellDate.getMonth(), dayOfMonth: cellDate.getDate() });
-                                    }
-                                    weeks.push(week);
-                                }
-
-                                // 逐天遍历：月份标签挂在"该月第一个日期"所在周，跨月周不再被错标到上月
-                                var monthLabels = [];
-                                var lastMonth = -1;
-                                for (var w = 0; w < weeks.length; w++) {
-                                    for (var d = 0; d < 7; d++) {
-                                        var day = weeks[w][d];
-                                        if (day.future) continue;
-                                        if (day.month !== lastMonth) {
-                                            monthLabels.push({ weekIndex: w, label: MONTHS[day.month] });
-                                            lastMonth = day.month;
+                                function buildHeatmap() {
+                                    // 手机端显示最近半年（26 周），桌面端全年（53 周）
+                                    var totalWeeks = MOBILE_QP.matches ? 26 : 53;
+                                    var gap = MOBILE_QP.matches ? 1 : 3;
+                                    var cell = 10;
+                                    if (MOBILE_QP.matches) {
+                                        // 格子自适应容器宽度，保持正方形；空间不足时缩减周数，最小格子 10px
+                                        var labelW = 14;
+                                        cell = Math.floor((heatmapWrap.clientWidth - labelW - (totalWeeks - 1) * gap) / totalWeeks);
+                                        while (cell < 10 && totalWeeks > 13) {
+                                            totalWeeks--;
+                                            cell = Math.floor((heatmapWrap.clientWidth - labelW - (totalWeeks - 1) * gap) / totalWeeks);
                                         }
                                     }
-                                }
-                                // 去掉首个标签：窗口首月不完整（通常只有末尾几周），且与窗口末月同名，
-                                // 只留一列宽还会让文字溢出与下一标签重叠；去掉后每月仅出现一次
-                                monthLabels.shift();
+                                    heatmapWrap.style.setProperty('--hm-cell', cell + 'px');
+                                    heatmapWrap.style.setProperty('--hm-gap', gap + 'px');
 
-                                var html = '<table>';
+                                    var today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    var endDay = today.getDay();
+                                    var totalDays = (totalWeeks - 1) * 7 + endDay + 1;
+                                    var startDate = new Date(today);
+                                    startDate.setDate(startDate.getDate() - totalDays + 1);
+                                    startDate.setDate(startDate.getDate() - startDate.getDay());
 
-                                html += '<tr><td class="heatmap-day-label"></td>';
-                                var monthColIdx = 0;
-                                for (var w = 0; w < totalWeeks; w++) {
-                                    if (monthColIdx < monthLabels.length && monthLabels[monthColIdx].weekIndex === w) {
-                                        var nextIdx = monthColIdx + 1 < monthLabels.length ? monthLabels[monthColIdx + 1].weekIndex : totalWeeks;
-                                        var span = nextIdx - w;
-                                        // 标签绝对定位在周列起点，脱离表格布局，列宽始终由格子决定
-                                        html += '<td colspan="' + span + '" class="heatmap-month-label"><span class="hm-month-text">' + monthLabels[monthColIdx].label + '</span></td>';
-                                        w += span - 1;
-                                        monthColIdx++;
-                                    } else {
-                                        html += '<td class="heatmap-month-label"></td>';
+                                    var weeks = [];
+                                    for (var w = 0; w < totalWeeks; w++) {
+                                        var week = [];
+                                        for (var d = 0; d < 7; d++) {
+                                            var cellDate = new Date(startDate);
+                                            cellDate.setDate(cellDate.getDate() + w * 7 + d);
+                                            var key = cellDate.getFullYear() + '-' + String(cellDate.getMonth() + 1).padStart(2, '0') + '-' + String(cellDate.getDate()).padStart(2, '0');
+                                            var count = heatmapData[key] || 0;
+                                            var level = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : count <= 5 ? 3 : 4;
+                                            var future = cellDate > today;
+                                            week.push({ date: cellDate, key: key, count: count, level: level, future: future, month: cellDate.getMonth(), dayOfMonth: cellDate.getDate() });
+                                        }
+                                        weeks.push(week);
                                     }
-                                }
-                                html += '</tr>';
 
-                                for (var d = 0; d < 7; d++) {
-                                    html += '<tr>';
-                                    html += '<td class="heatmap-day-label">' + DAYS[d] + '</td>';
+                                    // 逐天遍历：月份标签挂在"该月第一个日期"所在周，跨月周不再被错标到上月
+                                    var monthLabels = [];
+                                    var lastMonth = -1;
                                     for (var w = 0; w < weeks.length; w++) {
-                                        var c = weeks[w][d];
-                                        if (c.future) {
-                                            html += '<td></td>';
+                                        for (var d = 0; d < 7; d++) {
+                                            var day = weeks[w][d];
+                                            if (day.future) continue;
+                                            if (day.month !== lastMonth) {
+                                                monthLabels.push({ weekIndex: w, label: MONTHS[day.month] });
+                                                lastMonth = day.month;
+                                            }
+                                        }
+                                    }
+                                    // 去掉首个标签：窗口首月不完整（通常只有末尾几周），且与窗口末月同名，
+                                    // 只留一列宽还会让文字溢出与下一标签重叠；去掉后每月仅出现一次
+                                    monthLabels.shift();
+
+                                    var html = '<table>';
+
+                                    html += '<tr><td class="heatmap-day-label"></td>';
+                                    var monthColIdx = 0;
+                                    for (var w = 0; w < totalWeeks; w++) {
+                                        if (monthColIdx < monthLabels.length && monthLabels[monthColIdx].weekIndex === w) {
+                                            var nextIdx = monthColIdx + 1 < monthLabels.length ? monthLabels[monthColIdx + 1].weekIndex : totalWeeks;
+                                            var span = nextIdx - w;
+                                            // 标签绝对定位在周列起点，脱离表格布局，列宽始终由格子决定
+                                            html += '<td colspan="' + span + '" class="heatmap-month-label"><span class="hm-month-text">' + monthLabels[monthColIdx].label + '</span></td>';
+                                            w += span - 1;
+                                            monthColIdx++;
                                         } else {
-                                            html += '<td class="hm-cell hm-' + c.level + '" title="' + c.key + ': ' + c.count + ' 条闪念"></td>';
+                                            html += '<td class="heatmap-month-label"></td>';
                                         }
                                     }
                                     html += '</tr>';
+
+                                    for (var d = 0; d < 7; d++) {
+                                        html += '<tr>';
+                                        html += '<td class="heatmap-day-label">' + DAYS[d] + '</td>';
+                                        for (var w = 0; w < weeks.length; w++) {
+                                            var c = weeks[w][d];
+                                            if (c.future) {
+                                                html += '<td></td>';
+                                            } else {
+                                                html += '<td class="hm-cell hm-' + c.level + '" title="' + c.key + ': ' + c.count + ' 条闪念"></td>';
+                                            }
+                                        }
+                                        html += '</tr>';
+                                    }
+
+                                    html += '</table>';
+                                    heatmapRoot.innerHTML = html;
+                                    document.getElementById('heatmap-total').textContent = (MOBILE_QP.matches ? '近半年' : '过去一年') + '共 ' + totalItems + ' 条闪念';
+
+                                    if (!MOBILE_QP.matches && heatmapWrap) {
+                                        heatmapWrap.scrollLeft = heatmapWrap.scrollWidth;
+                                    }
                                 }
 
-                                html += '</table>';
-                                var root = document.getElementById('heatmap-root');
-                                root.innerHTML = html;
-                                document.getElementById('heatmap-total').textContent = '过去一年共 ' + totalItems + ' 条闪念';
-
-                                setTimeout(function () {
-                                    var wrap = document.querySelector('.heatmap-wrap');
-                                    if (wrap) {
-                                        wrap.scrollLeft = wrap.scrollWidth;
-                                    }
-                                }, 100);
+                                buildHeatmap();
+                                var heatmapResizeTimer;
+                                window.addEventListener('resize', function () {
+                                    clearTimeout(heatmapResizeTimer);
+                                    heatmapResizeTimer = setTimeout(buildHeatmap, 150);
+                                });
 
                                 // ======= 分页 =======
                                 function updatePagination() {

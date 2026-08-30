@@ -40,7 +40,7 @@ a:hover { color: {{.Site.CustomConfig.linkHoverColor | safeCSS}}; }
 {{.Site.CustomConfig.customCss | safeCSS}}
 {{end}}
 </style>
-<link rel="alternate" type="application/atom+xml" title="{{or .SiteTitle .ThemeConfig.SiteName}} - Atom Feed" href="/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="{{or .SiteTitle .ThemeConfig.SiteName}} - Atom Feed" href="/feed.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 {{if .Site.CustomConfig.ga}}
