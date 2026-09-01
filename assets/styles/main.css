@@ -1314,3 +1314,349 @@ html.dark .hljs-deletion {
 html.dark .hljs-addition {
   background: rgba(46, 160, 67, 0.4);
 }
+
+/* ===== 闪念页 Memos ===== */
+.memos-wrapper {
+  width: 100%;
+}
+
+/* 热力图 */
+.heatmap-wrap {
+  --hm-0: #ebedf0;
+  --hm-1: #9be9a8;
+  --hm-2: #40c463;
+  --hm-3: #28df99;
+  --hm-4: #1a9f6b;
+  --hm-cell: 10px;
+  --hm-gap: 3px;
+  overflow-x: auto;
+  padding: 8px 0 16px;
+  margin-bottom: 8px;
+}
+.heatmap-wrap table {
+  border-collapse: separate;
+  border-spacing: var(--hm-gap);
+  margin: 0 auto;
+  font-size: 0;
+  line-height: 0;
+}
+.heatmap-wrap td.hm-cell {
+  width: var(--hm-cell);
+  height: var(--hm-cell);
+  border-radius: 2px;
+  padding: 0;
+}
+.heatmap-wrap .hm-cell.hm-0 { background: var(--hm-0); }
+.heatmap-wrap .hm-cell.hm-1 { background: var(--hm-1); }
+.heatmap-wrap .hm-cell.hm-2 { background: var(--hm-2); }
+.heatmap-wrap .hm-cell.hm-3 { background: var(--hm-3); }
+.heatmap-wrap .hm-cell.hm-4 { background: var(--hm-4); }
+.heatmap-wrap .heatmap-day-label {
+  font-size: 10px;
+  line-height: 10px;
+  color: #868e96;
+  text-align: right;
+  padding: 0 4px 0 0;
+  border: 0;
+}
+.heatmap-wrap .heatmap-month-label {
+  position: relative;
+  height: 10px;
+  font-size: 10px;
+  line-height: 10px;
+  color: #868e96;
+  text-align: left;
+  padding: 0;
+  border: 0;
+}
+.heatmap-wrap .heatmap-month-label .hm-month-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+}
+.heatmap-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #868e96;
+  padding: 8px 4px 0;
+}
+.heatmap-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #868e96;
+}
+.heatmap-legend .hm-cell {
+  width: 10px;
+  height: 10px;
+}
+
+/* Tag 过滤 */
+.memo-tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+.memo-tag-btn {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.memo-tag-btn:hover {
+  border-color: #006CFF;
+  color: #006CFF;
+}
+.memo-tag-btn.active {
+  background: #006CFF;
+  border-color: #006CFF;
+  color: #fff;
+}
+.memo-tag-btn .memo-tag-count {
+  opacity: 0.7;
+  margin-left: 2px;
+}
+.memo-filter-empty {
+  display: none;
+  text-align: center;
+  padding: 32px 0;
+  color: #868e96;
+  font-size: 14px;
+}
+
+/* 闪念列表 */
+.memos-list {
+  margin-top: 8px;
+}
+.memo-item.memo-hide {
+  display: none;
+}
+.memo-item {
+  padding: 20px 0;
+  border-bottom: 1px solid #dfe2e5;
+}
+.memo-item:last-child {
+  border-bottom: 0;
+}
+.memo-body {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.memo-body.collapsed {
+  max-height: 160px;
+}
+.memo-content {
+  line-height: 1.62;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  word-wrap: break-word;
+}
+.memo-content a {
+  color: #006CFF;
+  border-bottom: 1px solid rgba(0, 108, 255, 0.3);
+  transition: all 0.3s;
+}
+.memo-content a:hover {
+  color: #0061e6;
+  border-bottom: 1px solid #0061e6;
+}
+.memo-content img {
+  max-width: 100%;
+  border-radius: 2px;
+  margin: 8px 0;
+}
+.memo-content blockquote {
+  color: #9a9a9a;
+  border-left: 3px solid #dfe2e5;
+  padding-left: 12px;
+  margin: 8px 0;
+}
+.memo-content p code,
+.memo-content li code {
+  font-family: 'Source Code Pro', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  background-color: #fff5f5;
+  color: #c53030;
+  padding: 0.2em 0.33333333em;
+  margin: 0 0.125em;
+  line-height: initial;
+  word-wrap: break-word;
+}
+.memo-content pre {
+  background: #f9f7f3;
+  border-radius: 5px;
+  padding: 1em;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.memo-content pre code {
+  font-family: 'Source Code Pro', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  font-size: 0.96em;
+  line-height: 1.5;
+  background: none;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+}
+.memo-expand-btn {
+  display: none;
+  margin-top: 8px;
+  padding: 2px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: #868e96;
+  transition: all 0.3s;
+}
+.memo-expand-btn:hover {
+  color: #006CFF;
+}
+.memo-tags {
+  margin-top: 8px;
+}
+.memo-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 4px 8px 0 0;
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 2px;
+  font-size: 12px;
+}
+.memo-meta {
+  margin-top: 8px;
+}
+.memo-meta time {
+  font-size: 12px;
+  color: #5E5E5E;
+}
+
+/* 分页 */
+.memo-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0 8px;
+  overflow: hidden;
+}
+.memo-pagination a {
+  padding: 6px 4px;
+  font-weight: bold;
+  border-bottom: 2px solid transparent;
+}
+.memo-pagination a:hover {
+  border-bottom: 2px solid;
+}
+.memo-pagination a.disabled {
+  color: #ced4da;
+  pointer-events: none;
+}
+.memo-page-info {
+  font-size: 12px;
+  color: #868e96;
+}
+
+/* 空状态 */
+.memos-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: #868e96;
+}
+
+/* ===== 手机端热力图适配 ===== */
+@media (max-width: 600px) {
+  .heatmap-wrap {
+    /* 撑满文章内容区，格子尺寸由脚本按容器宽度自适应 */
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+}
+
+/* ===== 黑暗模式 ===== */
+html.dark .heatmap-wrap {
+  --hm-0: #2d2d2d;
+  --hm-1: #0e4429;
+  --hm-2: #006d32;
+  --hm-3: #26a641;
+  --hm-4: #39d353;
+}
+html.dark .heatmap-wrap .heatmap-day-label,
+html.dark .heatmap-wrap .heatmap-month-label,
+html.dark .heatmap-footer,
+html.dark .heatmap-legend {
+  color: #9aa4af;
+}
+html.dark .memo-item {
+  border-bottom-color: #3a3a3a;
+}
+html.dark .memo-tag-btn {
+  background: #2a2a2a;
+  color: #a8b0ba;
+  border-color: #3a3a3a;
+}
+html.dark .memo-tag-btn:hover {
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+html.dark .memo-tag-btn.active {
+  background: #58a6ff;
+  border-color: #58a6ff;
+  color: #1a1a1a;
+}
+html.dark .memo-filter-empty {
+  color: #9aa4af;
+}
+html.dark .memo-content a {
+  color: #58a6ff;
+  border-bottom-color: rgba(88, 166, 255, 0.3);
+}
+html.dark .memo-content a:hover {
+  color: #58a6ff;
+  border-bottom-color: #58a6ff;
+}
+html.dark .memo-content blockquote {
+  color: #b0b0b0;
+  border-left-color: #3a3a3a;
+}
+html.dark .memo-content p code,
+html.dark .memo-content li code {
+  background-color: rgba(255, 94, 94, 0.16);
+  color: #ffa1a1;
+}
+html.dark .memo-content pre {
+  background: #212121;
+}
+html.dark .memo-expand-btn {
+  color: #9aa4af;
+}
+html.dark .memo-expand-btn:hover {
+  color: #58a6ff;
+}
+html.dark .memo-tag {
+  background: #2a2a2a;
+  color: #a8b0ba;
+}
+html.dark .memo-meta time {
+  color: #9a9a9a;
+}
+html.dark .memo-pagination a.disabled {
+  color: #6b7280;
+}
+html.dark .memo-page-info {
+  color: #9aa4af;
+}
+html.dark .memos-empty {
+  color: #9aa4af;
+}
+
