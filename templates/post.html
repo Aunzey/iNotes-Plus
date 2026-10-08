@@ -47,7 +47,7 @@
                     <img class="post-feature-image" src="{{.Post.Feature}}" alt="">
                     {{end}}
                     <div class="post-content-wrapper">
-                        <div class="post-content" v-pre>
+                        <div class="post-content{{if eq .Post.FileName "photos"}} photos-intro{{end}}" v-pre>
                             {{.Post.Content}}
                         </div>
                         <div class="toc-container">
@@ -94,6 +94,10 @@
             {{if eq .CommentSetting.CommentPlatform "disqus"}}
             {{template "disqus" .}}
             {{end}}
+            {{end}}
+
+            {{if eq .Post.FileName "photos"}}
+            {{template "photo-masonry" .}}
             {{end}}
 
             {{template "footer" .}}
