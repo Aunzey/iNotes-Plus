@@ -2,10 +2,7 @@
 
 > Gridea-Pro iNotes 主题升级版
 
-本主题基于以下上游：
-
-- [getgridea/gridea-theme-notes](https://github.com/getgridea/gridea-theme-notes) — 最初的 Notes 主题
-- [Gridea-Pro/gridea-pro-themes · themes/inotes](https://github.com/Gridea-Pro/gridea-pro-themes/tree/main/themes/inotes) — Gridea Pro 官方移植的 inotes（1.0.0）
+本主题基于 [Gridea-Pro/gridea-pro-themes · themes/inotes](https://github.com/Gridea-Pro/gridea-pro-themes/tree/main/themes/inotes) 改造。
 
 ## 信息
 
@@ -124,4 +121,4 @@ JPEG 的 EXIF 段得到的。受浏览器安全策略限制，**必须同时满�
 
 ## 授权
 
-**MIT**
+本项目采用 **MIT** 许可，全文见 [LICENSE](./LICENSE)。

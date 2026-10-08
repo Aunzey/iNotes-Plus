@@ -5,8 +5,7 @@
   "description":"iNotes 主题升级版",
   "templateEngine": "go",
   "repository": "https://github.com/Aunzey/iNotes-Plus",
-  "repository_1": "https://github.com/getgridea/gridea-theme-notes",
-  "repository_2": "https://github.com/Gridea-Pro/gridea-pro-themes/blob/main/themes/inotes",
+  "repository_1": "https://github.com/Gridea-Pro/gridea-pro-themes/blob/main/themes/inotes",
   "customConfig": [
     {
       "name": "contentMaxWidth",
